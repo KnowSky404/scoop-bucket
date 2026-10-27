@@ -41,7 +41,9 @@ function Publish-FlagUpdate {
     $expectedUrl = "https://github.com/Chasmical/flag-emojis-for-windows/releases/download/v$NewVersion/Segoe.UI.Emoji.with.Twemoji.Flags.zip"
     if ($localManifest.version -cne $NewVersion -or $localManifest.hash -ine $Hash -or $localManifest.url -cne $expectedUrl) { throw 'Local manifest does not match the verified update.' }
     $branch = "automation/flag-emojis-$NewVersion"
-    $prs = @(Invoke-UpdateGh @('pr', 'list', '--repo', $Repository, '--head', $branch, '--base', 'main', '--state', 'all', '--json', 'number,state,url') | ConvertFrom-Json)
+    $prData = Invoke-UpdateGh @('pr', 'list', '--repo', $Repository, '--head', $branch, '--base', 'main', '--state', 'all', '--json', 'number,state,url') | ConvertFrom-Json
+    # Windows PowerShell can emit an empty JSON array as one pipeline object.
+    $prs = @($prData | Where-Object { $_.number })
     if ($prs.Count -gt 0) {
         Write-Host "Existing PR for $NewVersion ($($prs[0].state)): $($prs[0].url). No duplicate; closed PRs require maintainer action, merged PRs require refreshing main."
         return
