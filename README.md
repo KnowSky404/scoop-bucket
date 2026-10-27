@@ -16,7 +16,7 @@ scoop bucket list
 scoop info KnowSky404/flag-emojis-for-windows
 ~~~
 
-If you previously added this bucket as `knowsky`, remove that bucket entry and add it again using the commands above. This does not uninstall packages already installed from it.
+If you previously added this bucket as `knowsky`, keep that entry and skip the `bucket add` command above: installed packages retain their original bucket association for future updates. If you already removed it, restore it with `scoop bucket add knowsky https://github.com/KnowSky404/scoop-bucket`. Use `knowsky/flag-emojis-for-windows` in place of `KnowSky404/flag-emojis-for-windows`. To remove the bucket after uninstalling its packages, use `scoop bucket rm knowsky`.
 
 ### Available manifests
 
