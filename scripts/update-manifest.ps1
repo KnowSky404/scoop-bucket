@@ -28,7 +28,7 @@ try {
 $m.version = $newVersion
 $m.url = $url
 $m.hash = $sha
-[IO.File]::WriteAllText($path, (($m | ConvertTo-Json -Depth 30) + "\u0060n"), [Text.UTF8Encoding]::new($false))
+[IO.File]::WriteAllText($path, (($m | ConvertTo-Json -Depth 30) + "`n"), [Text.UTF8Encoding]::new($false))
 if ($env:GITHUB_OUTPUT) {
     Add-Content $env:GITHUB_OUTPUT 'changed=true'
     Add-Content $env:GITHUB_OUTPUT "version=$newVersion"
