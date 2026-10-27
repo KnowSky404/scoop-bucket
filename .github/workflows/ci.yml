@@ -9,6 +9,7 @@ permissions:
 jobs:
   scoop-tests:
     runs-on: windows-latest
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -25,28 +26,30 @@ jobs:
         with:
           repository: ScoopInstaller/Scoop
           path: scoop_core
-      - uses: potatoqualitee/psmodulecache@9e4b63833c22c1768d648e115a9c849afdda22a5 # v6.3
-        with:
-          modules-to-cache: BuildHelpers, Pester
-          shell: ${{ matrix.shell }}
+      - name: Install test dependencies from PowerShell Gallery
+        run: |
+          $ErrorActionPreference = 'Stop'
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+          if ('${{ matrix.shell }}' -eq 'powershell') { Install-PackageProvider NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null }
+          Install-Module BuildHelpers -MinimumVersion 2.0.1 -Scope CurrentUser -Force
+          Install-Module Pester -MinimumVersion 5.2.0 -Scope CurrentUser -Force -SkipPublisherCheck
       - name: Run Scoop manifest tests and static safety assertions
         run: |
           $env:SCOOP_HOME = "$(Convert-Path '.\scoop_core')"
           .\bucket_repo\bin\test.ps1
   checksum:
     runs-on: windows-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Verify ZIP SHA256 without installing fonts
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ScoopInstaller/Scoop
+          path: scoop_core
+      - name: Verify official release URL and SHA256 without installing fonts
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          $ErrorActionPreference = 'Stop'
-          $m = Get-Content 'bucket/flag-emojis-for-windows.json' -Raw | ConvertFrom-Json
-          $path = Join-Path $env:RUNNER_TEMP 'flag-emojis.zip'
-          try {
-            Invoke-WebRequest -Uri $m.url -OutFile $path
-            $hash = (Get-FileHash $path -Algorithm SHA256).Hash
-            if ($hash -ine $m.hash) { throw "SHA256 mismatch: $hash" }
-          } finally {
-            Remove-Item $path -ErrorAction SilentlyContinue
-          }
+          $env:SCOOP_HOME = "$(Convert-Path '.\scoop_core')"
+          ./scripts/check-hashes.ps1

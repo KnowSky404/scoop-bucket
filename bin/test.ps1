@@ -6,5 +6,7 @@ $config = New-PesterConfiguration -Hashtable @{
     Run = @{ Path = "$PSScriptRoot/.."; PassThru = $true }
     Output = @{ Verbosity = 'Detailed' }
 }
+# Validate every manifest, including on documentation-only dispatches.
+$env:CI = 'false'
 $result = Invoke-Pester -Configuration $config
 exit $result.FailedCount
