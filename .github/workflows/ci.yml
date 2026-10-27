@@ -1,0 +1,52 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  scoop-tests:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shell: [powershell, pwsh]
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+          path: bucket_repo
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ScoopInstaller/Scoop
+          path: scoop_core
+      - uses: potatoqualitee/psmodulecache@9e4b63833c22c1768d648e115a9c849afdda22a5 # v6.3
+        with:
+          modules-to-cache: BuildHelpers, Pester
+          shell: ${{ matrix.shell }}
+      - name: Run Scoop manifest tests and static safety assertions
+        run: |
+          $env:SCOOP_HOME = "$(Convert-Path '.\scoop_core')"
+          .\bucket_repo\bin\test.ps1
+  checksum:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Verify ZIP SHA256 without installing fonts
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $m = Get-Content 'bucket/flag-emojis-for-windows.json' -Raw | ConvertFrom-Json
+          $path = Join-Path $env:RUNNER_TEMP 'flag-emojis.zip'
+          try {
+            Invoke-WebRequest -Uri $m.url -OutFile $path
+            $hash = (Get-FileHash $path -Algorithm SHA256).Hash
+            if ($hash -ine $m.hash) { throw "SHA256 mismatch: $hash" }
+          } finally {
+            Remove-Item $path -ErrorAction SilentlyContinue
+          }
