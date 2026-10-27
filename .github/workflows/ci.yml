@@ -26,15 +26,18 @@ jobs:
         with:
           repository: ScoopInstaller/Scoop
           path: scoop_core
-      - name: Install test dependencies from PowerShell Gallery
+      - name: Save compatible test dependencies from PowerShell Gallery
+        shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-          if ('${{ matrix.shell }}' -eq 'powershell') { Install-PackageProvider NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null }
-          Install-Module BuildHelpers -MinimumVersion 2.0.1 -Scope CurrentUser -Force
-          Install-Module Pester -MinimumVersion 5.2.0 -Scope CurrentUser -Force -SkipPublisherCheck
+          $moduleRoot = Join-Path $env:RUNNER_TEMP 'bucket-test-modules'
+          New-Item -ItemType Directory -Path $moduleRoot -Force | Out-Null
+          Save-Module BuildHelpers -MinimumVersion 2.0.1 -Path $moduleRoot -Force
+          Save-Module Pester -MinimumVersion 5.2.0 -Path $moduleRoot -Force
+          "BUCKET_TEST_MODULES=$moduleRoot" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
       - name: Run Scoop manifest tests and static safety assertions
         run: |
+          $env:PSModulePath = "$env:BUCKET_TEST_MODULES;$env:PSModulePath"
           $env:SCOOP_HOME = "$(Convert-Path '.\scoop_core')"
           .\bucket_repo\bin\test.ps1
   checksum:
