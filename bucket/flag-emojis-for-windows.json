@@ -7,12 +7,12 @@
     "url": "https://github.com/Chasmical/flag-emojis-for-windows/releases/download/v2.3.0/Segoe.UI.Emoji.with.Twemoji.Flags.zip",
     "hash": "d4a924fa96576a3f247834995777295a2e92ddadabc8456fef8e7e4bdd502902",
     "pre_install": [
-        "if (-not $global) { throw 'Use elevated PowerShell: scoop install -g knowsky/flag-emojis-for-windows; user installs unsupported.' }"
+        "if (-not $global) { throw 'Use elevated PowerShell: scoop install -g KnowSky404/flag-emojis-for-windows; user installs unsupported.' }"
     ],
     "installer": {
         "script": [
             "$ErrorActionPreference = 'Stop'",
-            "if (-not $global) { throw 'Use elevated PowerShell: scoop install -g knowsky/flag-emojis-for-windows' }",
+            "if (-not $global) { throw 'Use elevated PowerShell: scoop install -g KnowSky404/flag-emojis-for-windows' }",
             "if (-not (is_admin)) { throw 'Administrator privileges are required.' }",
             "if ($version -notmatch '^\\d+\\.\\d+\\.\\d+$') { throw \"Invalid package version: $version\" }",
             "$regPath = 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts'",

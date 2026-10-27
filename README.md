@@ -1,4 +1,4 @@
-# KnowSky Scoop Bucket
+# KnowSky404 Scoop Bucket
 
 [![CI](https://github.com/KnowSky404/scoop-bucket/actions/workflows/ci.yml/badge.svg)](https://github.com/KnowSky404/scoop-bucket/actions/workflows/ci.yml) [![MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
@@ -11,10 +11,12 @@ A personal [Scoop](https://scoop.sh) bucket for Windows tools, fonts, and utilit
 In a **normal PowerShell window**, add this Bucket:
 
 ~~~powershell
-scoop bucket add knowsky https://github.com/KnowSky404/scoop-bucket
+scoop bucket add KnowSky404 https://github.com/KnowSky404/scoop-bucket
 scoop bucket list
-scoop info knowsky/flag-emojis-for-windows
+scoop info KnowSky404/flag-emojis-for-windows
 ~~~
+
+If you previously added this bucket as `knowsky`, remove that bucket entry and add it again using the commands above. This does not uninstall packages already installed from it.
 
 ### Available manifests
 
@@ -27,7 +29,7 @@ The font modifies the HKLM Segoe UI Emoji mapping. It must **not** be installed 
 Open **PowerShell as Administrator** to install:
 
 ~~~powershell
-scoop install -g knowsky/flag-emojis-for-windows
+scoop install -g KnowSky404/flag-emojis-for-windows
 ~~~
 
 Restart Windows afterward. In a **normal shell**, refresh Scoop and bucket manifests (this does not upgrade installed software):
@@ -51,7 +53,7 @@ The hooks require the original font file to exist, accept only the original mapp
 After uninstalling packages, remove the bucket in a **normal shell**:
 
 ~~~powershell
-scoop bucket rm knowsky
+scoop bucket rm KnowSky404
 ~~~
 
 ## Maintaining the bucket
