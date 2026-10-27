@@ -30,25 +30,41 @@ Open **PowerShell as Administrator** to install:
 scoop install -g knowsky/flag-emojis-for-windows
 ~~~
 
-Restart Windows afterward. To update or uninstall from the elevated shell:
+Restart Windows afterward. In a **normal shell**, refresh Scoop and bucket manifests (this does not upgrade installed software):
 
 ~~~powershell
 scoop update
+~~~
+
+In **administrator PowerShell**, upgrade or uninstall the installed global font:
+
+~~~powershell
 scoop update -g flag-emojis-for-windows
 # Or uninstall and restore the original mapping:
 scoop uninstall -g flag-emojis-for-windows
 ~~~
 
-After removing installed packages, remove the Bucket with: scoop bucket rm knowsky.
+Restart after upgrade or removal. Scoop runs the **old uninstaller before the new installer**. A failed upgrade can leave the original Windows mapping active; Scoop does not roll back all system effects. Locked versioned files can remain for manual inspection after restart. Keep the old package directory until recovery is understood; `scoop cleanup` removes old package files, not locked copies in Windows Fonts. Windows Update may reset the mapping: inspect it before retrying or reinstalling. Never overwrite or delete Windows' original `seguiemj.ttf`.
+
+The hooks require the original font file to exist, accept only the original mapping or the exact matching current package file, compare an existing target's content with the package source, unload their GDI resource during removal, and notify applications with a bounded timeout. They reject unknown replacements. File existence does not authenticate the Windows original: repair a suspect OS font through Windows servicing before installing this package.
+
+After uninstalling packages, remove the bucket in a **normal shell**:
+
+~~~powershell
+scoop bucket rm knowsky
+~~~
 
 ## Maintaining the bucket
 
 - [CI](.github/workflows/ci.yml): Scoop manifest checks, safety invariants, release checksum validation. Never modifies system fonts.
 - [Update workflow](.github/workflows/autoupdate.yml): checks upstream daily and opens **draft PRs** for review, without pushing directly to main.
-- The GitHub repository must permit Actions to create pull requests; workflow-created PRs using GITHUB_TOKEN do not normally trigger further PR workflows. Dispatch CI for the update branch manually.
+- Default Actions token permissions are read-only; only the updater job requests repository/PR writes. Actions PR creation is enabled. No PAT is stored for updating.
+- According to [GitHub's current documentation](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow), PRs created/updated with `GITHUB_TOKEN` can start **approval-required CI**. Review the head and select **Approve workflows to run**; if no run appears, manually dispatch CI on the branch. See the executable [review procedure](docs/CONTRIBUTING.md#reviewing-bot-prs-and-running-ci).
+- `main` is protected by a ruleset requiring PRs and the observed Windows PowerShell, PowerShell 7 and checksum checks. There is no bypass or automatic merge. Dependabot proposes Actions updates weekly.
+- The updater verifies official stable tags/ZIP URLs, release digests and independent hashes. Equal versions make no commit; reruns recover matching orphan branches and avoid duplicate PRs. Only Flag Emojis is auto-updated today; CI discovers ordinary additional manifests automatically.
 - [Contributing guide](docs/CONTRIBUTING.md) · [Agent instructions](AGENTS.md)
 
-**Testing limitation:** The actual installation, upgrade, and uninstall on Windows still require isolated-machine validation. Do not assume static CI validates Windows font registration.
+**Testing limitation:** The installation, upgrade, rollback, file locking, restart/display behavior and Windows Update recovery still require isolated Windows acceptance. CI uses a mocked registry/filesystem and a native API double; it never changes runner system fonts. See the [acceptance checklist](docs/TROUBLESHOOTING.md#isolated-windows-acceptance) and [delivery evidence](VERIFICATION.md).
 
 ## License and attribution
 

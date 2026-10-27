@@ -14,3 +14,23 @@ Describe 'Flag Emoji manifest safety checks' {
     }
 }
 
+
+Describe 'PowerShell syntax (never invokes hooks)' {
+    It 'parses lifecycle hooks for all manifests' {
+        Get-ChildItem (Join-Path $PSScriptRoot '../bucket') -Filter '*.json' | ForEach-Object {
+            $m = Get-Content $_.FullName -Raw | ConvertFrom-Json
+            $scopes = @($m) + @($m.architecture.PSObject.Properties | ForEach-Object { $_.Value })
+            foreach ($scope in $scopes) {
+                foreach ($name in @('pre_install','post_install','pre_uninstall','post_uninstall','installer','uninstaller')) {
+                    $code = $scope.$name
+                    if ($name -in @('installer','uninstaller')) { $code = $code.script }
+                    if ($code) {
+                        $parseErrors = $null
+                        $null = [System.Management.Automation.Language.Parser]::ParseInput(($code -join "`n"), [ref]$null, [ref]$parseErrors)
+                        $parseErrors | Should -BeNullOrEmpty -Because "$($_.Name) $name"
+                    }
+                }
+            }
+        }
+    }
+}
