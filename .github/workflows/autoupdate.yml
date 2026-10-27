@@ -1,0 +1,44 @@
+name: Upstream release updates
+on:
+  schedule:
+    - cron: '29 6 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+concurrency:
+  group: upstream-manifest-update
+  cancel-in-progress: false
+jobs:
+  propose:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Verify release and update manifest
+        id: release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./scripts/update-manifest.ps1
+      - name: Create reviewable draft PR
+        if: steps.release.outputs.changed == 'true'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEW_VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $branch = "automation/flag-emojis-$env:NEW_VERSION"
+          $remote = @(git ls-remote --heads origin "refs/heads/$branch")
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to check remote branches.' }
+          if ($remote.Count -gt 0) { Write-Host 'Update branch already exists.'; exit 0 }
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c $branch
+          git add bucket/flag-emojis-for-windows.json
+          git commit -m "chore: update flag-emojis-for-windows to $env:NEW_VERSION"
+          if ($LASTEXITCODE -ne 0) { throw 'Commit failed.' }
+          git push origin "HEAD:refs/heads/$branch"
+          if ($LASTEXITCODE -ne 0) { throw 'Push failed.' }
+          gh pr create --draft --base main --head $branch --title "chore: update flag-emojis-for-windows to $env:NEW_VERSION" --body "Upstream release: https://github.com/Chasmical/flag-emojis-for-windows/releases/tag/v$env:NEW_VERSION . ZIP SHA256 verified. Requires manual approval and Windows lifecycle testing; run CI on this PR branch before merging."
+          if ($LASTEXITCODE -ne 0) { throw 'PR creation failed. Check Actions workflow permissions.' }
