@@ -14,7 +14,7 @@ scoop bucket list
 scoop info KnowSky404/flag-emojis-for-windows
 ~~~
 
-如果之前使用 `knowsky` 添加过此 Bucket，请先移除旧的 Bucket 条目，再使用上面的命令重新添加。移除 Bucket 不会卸载已从中安装的软件包。
+如果之前使用 `knowsky` 添加过此 Bucket，请保留该条目并跳过上面的 `bucket add` 命令：已安装的软件包会保留原来的 Bucket 关联，以便后续更新。如果已经移除，可使用 `scoop bucket add knowsky https://github.com/KnowSky404/scoop-bucket` 恢复。命令中的 `KnowSky404/flag-emojis-for-windows` 应改为 `knowsky/flag-emojis-for-windows`。卸载相关软件包后，如需移除 Bucket，请使用 `scoop bucket rm knowsky`。
 
 ## 安装国旗 Emoji 字体
 
