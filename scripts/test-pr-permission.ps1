@@ -23,7 +23,8 @@ try {
 } finally {
     # Recover even when creation succeeded but its response/readback was interrupted.
     if (-not $prNumber) {
-        $prs = @(Invoke-UpdateGh @('pr', 'list', '--repo', $repo, '--head', $branch, '--state', 'open', '--json', 'number') | ConvertFrom-Json)
+        $prData = Invoke-UpdateGh @('pr', 'list', '--repo', $repo, '--head', $branch, '--state', 'open', '--json', 'number') | ConvertFrom-Json
+        $prs = @($prData | Where-Object { $_.number })
         if ($prs.Count -gt 0) { $prNumber = $prs[0].number }
     }
     if ($prNumber) { $null = Invoke-UpdateGh @('pr', 'close', "$prNumber", '--repo', $repo) }
