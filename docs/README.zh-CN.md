@@ -1,4 +1,4 @@
-# KnowSky Scoop Bucket：中文操作手册
+# KnowSky404 Scoop Bucket：中文操作手册
 
 [返回首页](../README.md)
 
@@ -9,10 +9,12 @@
 先安装 [Scoop](https://scoop.sh)，然后在**普通 PowerShell** 中执行：
 
 ~~~powershell
-scoop bucket add knowsky https://github.com/KnowSky404/scoop-bucket
+scoop bucket add KnowSky404 https://github.com/KnowSky404/scoop-bucket
 scoop bucket list
-scoop info knowsky/flag-emojis-for-windows
+scoop info KnowSky404/flag-emojis-for-windows
 ~~~
+
+如果之前使用 `knowsky` 添加过此 Bucket，请先移除旧的 Bucket 条目，再使用上面的命令重新添加。移除 Bucket 不会卸载已从中安装的软件包。
 
 ## 安装国旗 Emoji 字体
 
@@ -28,7 +30,7 @@ Copy-Item "$env:WINDIR\Fonts\seguiemj.ttf" "$env:USERPROFILE\Desktop\seguiemj-or
 首次安装时，映射通常应为 seguiemj.ttf。如果已经换成其他第三方字体，本包会拒绝覆盖，请先调查。
 
 ~~~powershell
-scoop install -g knowsky/flag-emojis-for-windows
+scoop install -g KnowSky404/flag-emojis-for-windows
 ~~~
 
 **安装后重启 Windows**。然后在 Edge、Zed 等应用中测试 🇯🇵 🇨🇳 🇺🇸 🇰🇷 😀 🎉 🐱。显示效果仍取决于应用字体回退机制。
@@ -68,7 +70,7 @@ Get-ChildItem "$env:WINDIR\Fonts\Segoe.UI.Emoji.with.Twemoji.Flags.scoop-*.ttf" 
 全部卸载后，在普通终端移除 Bucket：
 
 ~~~powershell
-scoop bucket rm knowsky
+scoop bucket rm KnowSky404
 ~~~
 
 ## 自动更新与注意事项
