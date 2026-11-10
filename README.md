@@ -1,6 +1,6 @@
 # KnowSky404 Scoop Bucket
 
-[![CI](https://github.com/KnowSky404/scoop-bucket/actions/workflows/ci.yml/badge.svg)](https://github.com/KnowSky404/scoop-bucket/actions/workflows/ci.yml) [![MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 A personal [Scoop](https://scoop.sh) bucket for Windows tools, fonts, and utilities. Manifests pin upstream assets by SHA256 and upstream release updates are reviewed through pull requests, never auto-merged.
 
@@ -58,12 +58,12 @@ scoop bucket rm KnowSky404
 
 ## Maintaining the bucket
 
-- [CI](.github/workflows/ci.yml): Scoop manifest checks, safety invariants, release checksum validation. Never modifies system fonts.
-- [Update workflow](.github/workflows/autoupdate.yml): checks upstream daily and opens **draft PRs** for review, without pushing directly to main.
+- [CI](.github/workflows/ci.yml) runs on manual dispatch: Scoop manifest checks, safety invariants, and release checksum validation. It never modifies system fonts.
+- [Update workflow](.github/workflows/autoupdate.yml) runs on manual dispatch from `main` and opens **draft PRs** for newer upstream releases, without pushing directly to main: `gh workflow run autoupdate.yml --repo KnowSky404/scoop-bucket --ref main`.
 - Default Actions token permissions are read-only; only the updater job requests repository/PR writes. Actions PR creation is enabled. No PAT is stored for updating.
-- According to [GitHub's current documentation](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow), PRs created/updated with `GITHUB_TOKEN` can start **approval-required CI**. Review the head and select **Approve workflows to run**; if no run appears, manually dispatch CI on the branch. See the executable [review procedure](docs/CONTRIBUTING.md#reviewing-bot-prs-and-running-ci).
-- `main` is protected by a ruleset requiring PRs and the observed Windows PowerShell, PowerShell 7 and checksum checks. There is no bypass or automatic merge. Dependabot proposes Actions updates weekly.
-- The updater verifies official stable tags/ZIP URLs, release digests and independent hashes. Equal versions make no commit; reruns recover matching orphan branches and avoid duplicate PRs. Only Flag Emojis is auto-updated today; CI discovers ordinary additional manifests automatically.
+- PRs and pushes do not run CI automatically. For manual CI and local PowerShell checks, see the [review and validation procedure](docs/CONTRIBUTING.md#reviewing-prs-and-running-ci).
+- The `main` ruleset requires PRs and resolved review conversations, and prevents force pushes and deletion. It no longer requires status checks; without one, GitHub does not enforce the configured up-to-date branch option. There is no bypass or automatic merge. Dependabot proposes Actions updates weekly.
+- The updater verifies official stable tags/ZIP URLs, release digests and independent hashes. Equal versions make no commit; reruns recover matching orphan branches and avoid duplicate PRs. Only Flag Emojis has update automation today; dispatched CI discovers ordinary additional manifests automatically.
 - [Contributing guide](docs/CONTRIBUTING.md) · [Agent instructions](AGENTS.md)
 
 **Testing limitation:** The installation, upgrade, rollback, file locking, restart/display behavior and Windows Update recovery still require isolated Windows acceptance. CI uses a mocked registry/filesystem and a native API double; it never changes runner system fonts. See the [acceptance checklist](docs/TROUBLESHOOTING.md#isolated-windows-acceptance) and [delivery evidence](VERIFICATION.md).

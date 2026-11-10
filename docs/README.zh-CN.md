@@ -73,15 +73,15 @@ Get-ChildItem "$env:WINDIR\Fonts\Segoe.UI.Emoji.with.Twemoji.Flags.scoop-*.ttf" 
 scoop bucket rm KnowSky404
 ~~~
 
-## 自动更新与注意事项
+## 手动维护与注意事项
 
-- Actions 每天检查上游发布并创建 Draft PR，不直接合并。
+- 更新任务不再每日运行。需要检查上游发布时，手动执行 `gh workflow run autoupdate.yml --repo KnowSky404/scoop-bucket --ref main`；发现新版时会创建 Draft PR，不直接合并。
 - 只有维护者审核合并后，scoop update 才会获取新版 Manifest。
 - 仓库默认 GITHUB_TOKEN 为只读；仅更新 Job 申请 contents / pull-requests 写权限。已开启 Actions 创建 PR，不保存额外 PAT，脚本不批准或合并 PR。
-- 依据 [GitHub 当前文档](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow)，GITHUB_TOKEN 创建或更新 PR 可产生**等待人工批准的 CI**。审核提交后点击 **Approve workflows to run**；若没有运行记录，按[贡献指南](CONTRIBUTING.md#reviewing-bot-prs-and-running-ci)对该分支手动 dispatch CI，确认 headSha 和 PR 最新提交一致且所有必需检查通过后再人工合并。
-- main 的 Ruleset 要求 PR、分支保持最新及三个实际 CI 检查通过；无绕过权限，不要求无法由单人满足的第二位审核者。Dependabot 每周提出 Actions 依赖更新，不自动合并。
+- 普通 PR 和 main push 不再自动运行 CI；可按[贡献指南](CONTRIBUTING.md#reviewing-prs-and-running-ci)手动对 PR 分支运行 CI，或在本地运行 PowerShell 测试和校验，手动 CI 应确认 headSha 与 PR 最新提交一致。
+- main 的 Ruleset 仍要求 PR 和解决讨论，并禁止强推与删除；三个状态检查不再是强制项。GitHub 在没有必需状态检查时不会实际执行已保留的分支保持最新选项。无绕过权限，不要求第二位审核者；Dependabot 每周提出 Actions 依赖更新，不自动合并。
 - 更新器检查稳定版标签、官方 ZIP 名称和 URL、Release Digest 与独立下载校验。无新版不提交；已有 PR 不重复创建；遗留分支只有与完整提案一致才恢复 PR 创建，否则报错，绝不强推。限流、网络或权限错误需解决后重试。
-- 目前仅 Flag Emojis 自动更新；普通新增清单由 CI 自动发现、验证 Schema 和各架构下载哈希，不需要复制字体钩子或重构 CI。
+- 目前仅 Flag Emojis 有更新自动化；手动运行的 CI 会发现普通新增清单，验证 Schema 和各架构下载哈希，不需要复制字体钩子或重构 CI。
 - 如果 Edge、Zed 显示仍异常，先重启，再检查字体映射和第三方替换冲突。
 - 初始字体生命周期脚本还未在你的真实 Windows 环境运行验证，首次使用建议先在可回滚的测试环境验收。
 

@@ -2,6 +2,8 @@
 
 Audit date: 2026-10-27. Changes are submitted on `maintenance/bucket-hardening`, not merged automatically. This report distinguishes live repository settings, proposed code, and unverified Windows behavior.
 
+This is a historical snapshot. For current workflow triggers and branch protection, see the [maintenance guide](docs/CONTRIBUTING.md).
+
 ## Repository resources (API write followed by readback)
 
 | Setting | Before | Verified after |
