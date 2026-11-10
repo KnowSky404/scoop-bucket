@@ -1,4 +1,4 @@
-# Shared by the scheduled updater and isolated Pester tests. No system-font operations.
+# Shared by the updater and isolated Pester tests. No system-font operations.
 function Invoke-UpdateGh {
     param([string[]]$Arguments)
     $output = & gh @Arguments
@@ -70,7 +70,7 @@ Release: https://github.com/Chasmical/flag-emojis-for-windows/releases/tag/v$New
 
 Verified stable release tag, exact official ZIP name/URL, release SHA256 digest, and independently downloaded ZIP SHA256: ``$Hash``.
 
-Maintainer: inspect the diff and release, approve pending CI via **Approve workflows to run**, and verify the Windows lifecycle on an isolated machine. If no PR run appears, dispatch CI on this branch: ``gh workflow run ci.yml --ref $branch``. Confirm green checks for the current head before marking ready and merging manually. No auto-merge.
+Maintainer: inspect the diff and release, dispatch CI on this branch with ``gh workflow run ci.yml --repo $Repository --ref $branch``, and verify the Windows lifecycle on an isolated machine. Confirm the run passed for the current head before marking ready and merging manually. No auto-merge.
 "@
     $bodyFile = Join-Path ([IO.Path]::GetTempPath()) ("scoop-pr-$([guid]::NewGuid()).md")
     try {

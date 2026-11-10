@@ -1,7 +1,5 @@
 name: Upstream release updates
 on:
-  schedule:
-    - cron: '29 6 * * *'
   workflow_dispatch:
     inputs:
       verify_pr_creation:
